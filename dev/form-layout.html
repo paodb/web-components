@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form Layout</title>
+
+    <script type="module">
+      import '@vaadin/form-layout';
+      import '@vaadin/form-layout/vaadin-form-item';
+      import '@vaadin/button';
+      import '@vaadin/checkbox';
+      import '@vaadin/checkbox-group';
+      import '@vaadin/combo-box';
+      import '@vaadin/custom-field';
+      import '@vaadin/date-picker';
+      import '@vaadin/radio-group';
+      import '@vaadin/select';
+      import '@vaadin/text-area';
+      import '@vaadin/text-field';
+
+      // import '@vaadin/form-layout/theme/material/vaadin-form-layout';
+      // import '@vaadin/form-layout/theme/material/vaadin-form-item';
+      // import '@vaadin/button/theme/material/vaadin-button';
+      // import '@vaadin/checkbox/theme/material/vaadin-checkbox';
+      // import '@vaadin/checkbox-group/theme/material/vaadin-checkbox-group';
+      // import '@vaadin/combo-box/theme/material/vaadin-combo-box';
+      // import '@vaadin/custom-field/theme/material/vaadin-custom-field';
+      // import '@vaadin/date-picker/theme/material/vaadin-date-picker';
+      // import '@vaadin/radio-group/theme/material/vaadin-radio-group';
+      // import '@vaadin/select/theme/material/vaadin-select';
+      // import '@vaadin/text-area/theme/material/vaadin-text-area';
+      // import '@vaadin/text-field/theme/material/vaadin-text-field';
+    </script>
+  </head>
+
+  <body>
+    <vaadin-form-layout>
+      <vaadin-text-field
+        label="Text field"
+        helper-text="Helper"
+        required
+        error-message="Error message"
+        colspan="2"
+      ></vaadin-text-field>
+
+      <vaadin-text-field
+        label="Long label for this field"
+        helper-text="Helper"
+        required
+        error-message="Error message"
+      ></vaadin-text-field>
+
+      <vaadin-select label="Select" helper-text="Helper" required error-message="Error message"></vaadin-select>
+
+      <vaadin-text-area
+        label="Text Area"
+        helper-text="Helper"
+        required
+        error-message="Error message"
+      ></vaadin-text-area>
+
+      <vaadin-date-picker
+        label="Date picker"
+        helper-text="Helper"
+        required
+        error-message="Error message"
+      ></vaadin-date-picker>
+
+      <vaadin-radio-group
+        label="Radio group"
+        helper-text="Helper"
+        required
+        error-message="Error message"
+        theme="vertical"
+      >
+        <vaadin-radio-button label="Option one"></vaadin-radio-button>
+        <vaadin-radio-button label="Option two"></vaadin-radio-button>
+        <vaadin-radio-button label="Option three"></vaadin-radio-button>
+      </vaadin-radio-group>
+
+      <vaadin-checkbox-group
+        label="Checkbox group"
+        helper-text="Helper"
+        required
+        error-message="Error message"
+        theme="vertical"
+      >
+        <vaadin-checkbox label="Option one"></vaadin-checkbox>
+        <vaadin-checkbox label="Option two"></vaadin-checkbox>
+        <vaadin-checkbox label="Option three"></vaadin-checkbox>
+      </vaadin-checkbox-group>
+
+      <vaadin-form-item>
+        <vaadin-checkbox label="Checkbox"></vaadin-checkbox>
+      </vaadin-form-item>
+
+      <div>
+        <vaadin-button>Button</vaadin-button>
+      </div>
+    </vaadin-form-layout>
+  </body>
+</html>

@@ -32,6 +32,17 @@ const requiredField = css`
     color: var(--material-error-text-color);
   }
 
+  :host([label-position='aside']) [part='label'] {
+    white-space: normal;
+    position: static;
+    transform: none;
+    margin-bottom: 0;
+    height: auto;
+    padding-top: calc(16px - 0.5em);
+    font-size: var(--material-small-font-size);
+    pointer-events: auto;
+  }
+
   [part='error-message'] {
     font-size: 0.75em;
     line-height: 1;

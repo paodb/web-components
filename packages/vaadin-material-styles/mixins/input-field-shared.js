@@ -155,7 +155,8 @@ const inputField = css`
   }
 
   /* Only target the visible floating label */
-  :host([has-label]:not([has-value]):not([focused]):not([invalid]):not([theme~='always-float-label'])) [part='label'] {
+  :host(:where([has-label]:not([has-value]):not([focused]):not([invalid]):not([theme~='always-float-label'])))
+    [part='label'] {
     width: 100%;
     transform: scale(1) translateY(24px);
     transition-timing-function: ease, ease, step-start;

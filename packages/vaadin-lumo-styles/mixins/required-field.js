@@ -28,7 +28,7 @@ const requiredField = css`
     box-sizing: border-box;
   }
 
-  :host([has-label])::before {
+  :host([has-label]:not([label-position='aside']))::before {
     margin-top: calc(var(--lumo-font-size-s) * 1.5);
   }
 
@@ -57,6 +57,17 @@ const requiredField = css`
 
   :host([invalid]) [part='required-indicator']::after {
     color: var(--lumo-required-field-indicator-color, var(--lumo-error-text-color));
+  }
+
+  :host([label-position='aside']) [part='label'] {
+    white-space: normal;
+    line-height: var(--lumo-line-height-s);
+    padding-top: calc((var(--lumo-text-field-size, var(--lumo-size-s)) - 1em * var(--lumo-line-height-s)) / 2);
+    padding-inline-end: 0;
+  }
+
+  :host([label-position='aside']) [part='required-indicator']::after {
+    position: static;
   }
 
   [part='error-message'] {

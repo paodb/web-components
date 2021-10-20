@@ -8,10 +8,14 @@ import { FlattenedNodesObserver } from '@polymer/polymer/lib/utils/flattened-nod
 import { DirMixin } from '@vaadin/component-base/src/dir-mixin.js';
 import { DisabledMixin } from '@vaadin/component-base/src/disabled-mixin.js';
 import { FieldMixin } from '@vaadin/field-base/src/field-mixin.js';
+import { inputFieldContainer } from '@vaadin/field-base/src/styles/input-field-container-styles.js';
 import { FocusMixin } from '@vaadin/component-base/src/focus-mixin.js';
 import { KeyboardMixin } from '@vaadin/component-base/src/keyboard-mixin.js';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
+import { registerStyles } from '@vaadin/vaadin-themable-mixin/register-styles.js';
 import { RadioButton } from './vaadin-radio-button.js';
+
+registerStyles('vaadin-radio-group', [inputFieldContainer], { moduleId: 'vaadin-radio-group-styles' });
 
 /**
  * `<vaadin-radio-group>` is a web component that allows the user to choose one item from a group of choices.
@@ -83,12 +87,6 @@ class RadioGroup extends FieldMixin(FocusMixin(DisabledMixin(KeyboardMixin(DirMi
 
         :host([hidden]) {
           display: none !important;
-        }
-
-        .vaadin-group-field-container {
-          display: flex;
-          flex-direction: column;
-          width: 100%;
         }
 
         :host(:not([has-label])) [part='label'] {

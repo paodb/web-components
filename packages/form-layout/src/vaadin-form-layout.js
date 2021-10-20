@@ -516,13 +516,7 @@ class FormLayout extends ElementMixin(ThemableMixin(mixinBehaviors([IronResizabl
         // Move the column counter
         col = (col + colspan) % this._columnCount;
 
-        if (child.localName === 'vaadin-form-item') {
-          if (this._labelsOnTop) {
-            child.setAttribute('label-position', 'top');
-          } else {
-            child.removeAttribute('label-position');
-          }
-        }
+        child.setAttribute('label-position', this._labelsOnTop ? 'top' : 'aside');
       });
   }
 }

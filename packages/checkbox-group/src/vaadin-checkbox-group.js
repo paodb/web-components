@@ -9,8 +9,12 @@ import { DirMixin } from '@vaadin/component-base/src/dir-mixin.js';
 import { DisabledMixin } from '@vaadin/component-base/src/disabled-mixin.js';
 import { FocusMixin } from '@vaadin/component-base/src/focus-mixin.js';
 import { FieldMixin } from '@vaadin/field-base/src/field-mixin.js';
+import { inputFieldContainer } from '@vaadin/field-base/src/styles/input-field-container-styles.js';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
+import { registerStyles } from '@vaadin/vaadin-themable-mixin/register-styles.js';
 import { Checkbox } from '@vaadin/checkbox/src/vaadin-checkbox.js';
+
+registerStyles('vaadin-checkbox-group', [inputFieldContainer], { moduleId: 'vaadin-checkbox-group-styles' });
 
 /**
  * `<vaadin-checkbox-group>` is a web component that allows the user to choose several items from a group of binary choices.
@@ -79,12 +83,6 @@ class CheckboxGroup extends FieldMixin(FocusMixin(DisabledMixin(DirMixin(Themabl
 
         :host([hidden]) {
           display: none !important;
-        }
-
-        .vaadin-group-field-container {
-          display: flex;
-          flex-direction: column;
-          width: 100%;
         }
 
         :host(:not([has-label])) [part='label'] {
