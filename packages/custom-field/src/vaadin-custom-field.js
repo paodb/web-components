@@ -8,7 +8,11 @@ import { FlattenedNodesObserver } from '@polymer/polymer/lib/utils/flattened-nod
 import { ElementMixin } from '@vaadin/component-base/src/element-mixin.js';
 import { FocusMixin } from '@vaadin/component-base/src/focus-mixin.js';
 import { FieldMixin } from '@vaadin/field-base/src/field-mixin.js';
+import { inputFieldContainer } from '@vaadin/field-base/src/styles/input-field-container-styles.js';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
+import { registerStyles } from '@vaadin/vaadin-themable-mixin/register-styles.js';
+
+registerStyles('vaadin-custom-field', [inputFieldContainer], { moduleId: 'vaadin-custom-field-styles' });
 
 /**
  * `<vaadin-custom-field>` is a web component for wrapping multiple components as a single field.
@@ -81,12 +85,6 @@ class CustomField extends FieldMixin(FocusMixin(ThemableMixin(ElementMixin(Polym
 
         :host([hidden]) {
           display: none !important;
-        }
-
-        .vaadin-custom-field-container {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
         }
 
         .inputs-wrapper {
