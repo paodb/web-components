@@ -13,6 +13,7 @@ export interface ContextMenuItem {
   disabled?: boolean;
   checked?: boolean;
   theme?: string[] | string;
+  class?: string;
   children?: ContextMenuItem[];
 }
 
