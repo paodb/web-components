@@ -39,7 +39,7 @@ export const ItemsMixin = (superClass) =>
          *
          * ```javascript
          * contextMenu.items = [
-         *   { text: 'Menu Item 1', theme: 'primary', children:
+         *   { text: 'Menu Item 1', theme: 'primary', class: 'first', children:
          *     [
          *       { text: 'Menu Item 1-1', checked: true },
          *       { text: 'Menu Item 1-2' }
@@ -52,7 +52,7 @@ export const ItemsMixin = (superClass) =>
          *       { text: 'Menu Item 2-2', disabled: true }
          *     ]
          *   },
-         *   { text: 'Menu Item 3', disabled: true }
+         *   { text: 'Menu Item 3', disabled: true, class: 'last' }
          * ];
          * ```
          *
