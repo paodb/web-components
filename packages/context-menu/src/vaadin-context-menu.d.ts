@@ -57,7 +57,7 @@ export interface ContextMenuEventMap extends HTMLElementEventMap, ContextMenuCus
  *
  * ```javascript
  * contextMenu.items = [
- *   { text: 'Menu Item 1', theme: 'primary', class: 'first', children:
+ *   { text: 'Menu Item 1', theme: 'primary', className: 'first', children:
  *     [
  *       { text: 'Menu Item 1-1', checked: true },
  *       { text: 'Menu Item 1-2' }
@@ -70,7 +70,7 @@ export interface ContextMenuEventMap extends HTMLElementEventMap, ContextMenuCus
  *       { text: 'Menu Item 2-2', disabled: true }
  *     ]
  *   },
- *   { text: 'Menu Item 3', disabled: true, class: 'last' }
+ *   { text: 'Menu Item 3', disabled: true, className: 'last' }
  * ];
  *
  * contextMenu.addEventListener('item-selected', e => {

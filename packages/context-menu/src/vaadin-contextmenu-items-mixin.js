@@ -23,7 +23,7 @@ export const ItemsMixin = (superClass) =>
          * Either a tagName or an element instance. Defaults to "vaadin-context-menu-item".
          * @property {boolean} disabled - If true, the item is disabled and cannot be selected
          * @property {boolean} checked - If true, the item shows a checkmark next to it
-         * @property {string} class - A space-delimited list of CSS class names to be set on the menu item component.
+         * @property {string} className - A space-delimited list of CSS class names to be set on the menu item component.
          * @property {union: string | string[]} theme - If set, sets the given theme(s) as an attribute to the menu item component, overriding any theme set on the context menu.
          * @property {MenuItem[]} children - Array of child menu items
          */
@@ -39,7 +39,7 @@ export const ItemsMixin = (superClass) =>
          *
          * ```javascript
          * contextMenu.items = [
-         *   { text: 'Menu Item 1', theme: 'primary', class: 'first', children:
+         *   { text: 'Menu Item 1', theme: 'primary', className: 'first', children:
          *     [
          *       { text: 'Menu Item 1-1', checked: true },
          *       { text: 'Menu Item 1-2' }
@@ -52,7 +52,7 @@ export const ItemsMixin = (superClass) =>
          *       { text: 'Menu Item 2-2', disabled: true }
          *     ]
          *   },
-         *   { text: 'Menu Item 3', disabled: true, class: 'last' }
+         *   { text: 'Menu Item 3', disabled: true, className: 'last' }
          * ];
          * ```
          *
@@ -195,8 +195,8 @@ export const ItemsMixin = (superClass) =>
 
         component._item = item;
 
-        if (item.class) {
-          component.setAttribute('class', item.class);
+        if (item.className) {
+          component.setAttribute('class', item.className);
         }
 
         if (item.text) {
