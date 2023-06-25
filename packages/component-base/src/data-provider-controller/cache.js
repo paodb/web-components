@@ -1,7 +1,30 @@
-/**
- * @private
- */
 export class Cache {
+  /**
+   * @type {import('../data-provider-controller.js').DataProviderController}
+   */
+  controller;
+
+  /**
+   * The number of items.
+   *
+   * @type {number}
+   */
+  size = 0;
+
+  /**
+   * The number of items to display per page.
+   *
+   * @type {number}
+   */
+  pageSize;
+
+  /**
+   * The total number of items, including items from expanded sub-caches.
+   *
+   * @type {number}
+   */
+  effectiveSize = 0;
+
   /**
    * An array of cached items.
    *
@@ -30,19 +53,19 @@ export class Cache {
   #subCacheByIndex = {};
 
   /**
-   * @param {Cache | undefined} parentCache
-   * @param {number | undefined} parentCacheIndex
+   * @param {Cache['controller']} controller
    * @param {number} pageSize
    * @param {number | undefined} size
-   * @param {Function} isExpanded
+   * @param {Cache | undefined} parentCache
+   * @param {number | undefined} parentCacheIndex
    */
-  constructor(parentCache, parentCacheIndex, pageSize, size, isExpanded) {
-    this.parentCache = parentCache;
-    this.parentCacheIndex = parentCacheIndex;
+  constructor(controller, pageSize, size, parentCache, parentCacheIndex) {
+    this.controller = controller;
     this.pageSize = pageSize;
     this.size = size || 0;
     this.effectiveSize = size || 0;
-    this.isExpanded = isExpanded;
+    this.parentCache = parentCache;
+    this.parentCacheIndex = parentCacheIndex;
   }
 
   /**
@@ -84,31 +107,13 @@ export class Cache {
    */
   recalculateEffectiveSize() {
     this.effectiveSize =
-      !this.parentItem || this.isExpanded(this.parentItem)
+      !this.parentItem || this.controller.isExpanded(this.parentItem)
         ? this.size +
           Object.values(this.#subCacheByIndex).reduce((total, subCache) => {
             subCache.recalculateEffectiveSize();
             return total + subCache.effectiveSize;
           }, 0)
         : 0;
-  }
-
-  /**
-   * Updates the cache's size and recalculates the effective size,
-   * propagating the result to the ancestor caches.
-   *
-   * @param {number} size
-   */
-  setSize(size) {
-    const delta = size - this.size;
-    this.size = size;
-
-    // eslint-disable-next-line @typescript-eslint/no-this-alias, consistent-this
-    let cache = this;
-    while (cache) {
-      cache.effectiveSize += delta;
-      cache = cache.parentCache;
-    }
   }
 
   /**
@@ -119,17 +124,10 @@ export class Cache {
    * @param {object[]} items
    */
   setPage(page, items) {
-    this.items.splice(page * this.pageSize, items.length, ...items);
-  }
-
-  /**
-   * Returns whether the given page has been loaded in the cache.
-   *
-   * @param {number} page
-   * @return {boolean}
-   */
-  isPageLoaded(page) {
-    return this.items[page * this.pageSize] !== undefined;
+    const startIndex = page * this.pageSize;
+    items.forEach((item, i) => {
+      this.items[startIndex + i] = item;
+    });
   }
 
   /**
@@ -150,7 +148,32 @@ export class Cache {
    * @param {number} index
    */
   removeSubCache(index) {
+    const subCache = this.getSubCache(index);
     delete this.#subCacheByIndex[index];
+
+    this.controller.dispatchEvent(
+      new CustomEvent('sub-cache-removed', {
+        detail: {
+          cache: this,
+          subCache,
+        },
+      }),
+    );
+  }
+
+  /**
+   * Removes all sub-caches.
+   */
+  removeSubCaches() {
+    this.#subCacheByIndex = {};
+
+    this.controller.dispatchEvent(
+      new CustomEvent('sub-caches-removed', {
+        detail: {
+          cache: this,
+        },
+      }),
+    );
   }
 
   /**
@@ -161,8 +184,18 @@ export class Cache {
    * @return {Cache}
    */
   createSubCache(index) {
-    const subCache = new Cache(this, index, this.pageSize, 0, this.isExpanded);
+    const subCache = new Cache(this.controller, this.pageSize, 0, this, index);
     this.#subCacheByIndex[index] = subCache;
+
+    this.controller.dispatchEvent(
+      new CustomEvent('sub-cache-created', {
+        detail: {
+          cache: this,
+          subCache,
+        },
+      }),
+    );
+
     return subCache;
   }
 

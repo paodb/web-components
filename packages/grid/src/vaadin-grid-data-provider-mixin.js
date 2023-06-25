@@ -24,7 +24,6 @@ export const DataProviderMixin = (superClass) =>
         size: {
           type: Number,
           notify: true,
-          observer: '_sizeChanged',
         },
 
         /**
@@ -119,10 +118,13 @@ export const DataProviderMixin = (superClass) =>
          */
         __expandedKeys: {
           type: Object,
-          observer: '__expandedKeysChanged',
           computed: '__computeExpandedKeys(itemIdPath, expandedItems.*)',
         },
       };
+    }
+
+    static get observers() {
+      return ['_sizeChanged(size)', '_expandedItemsChanged(expandedItems.*)'];
     }
 
     constructor() {
@@ -179,7 +181,7 @@ export const DataProviderMixin = (superClass) =>
         this.__updateLoading(el, false);
         this._updateItem(el, item);
         if (this._isExpanded(item)) {
-          this._dataProviderController.ensureFlatIndexChildrenLoaded(index);
+          this._dataProviderController.ensureFlatIndexHierarchy(index);
         }
       } else {
         this.__updateLoading(el, true);
@@ -222,7 +224,7 @@ export const DataProviderMixin = (superClass) =>
     }
 
     /** @private */
-    __expandedKeysChanged() {
+    _expandedItemsChanged() {
       this._dataProviderController.recalculateEffectiveSize();
       this._effectiveSize = this._dataProviderController.effectiveSize;
       this.__updateVisibleRows();
@@ -281,7 +283,7 @@ export const DataProviderMixin = (superClass) =>
 
       // After updating the cache, check if some of the expanded items should have sub-caches loaded
       this._getRenderedRows().forEach((row) => {
-        this._dataProviderController.ensureFlatIndexChildrenLoaded(row.index);
+        this._dataProviderController.ensureFlatIndexHierarchy(row.index);
       });
 
       this._hasData = true;
@@ -304,7 +306,7 @@ export const DataProviderMixin = (superClass) =>
       });
 
       // If the grid is not loading anything, flush the debouncer immediately
-      if (!this._dataProviderController.isLoading) {
+      if (!this._dataProviderController.isLoading()) {
         this._debouncerApplyCachedData.flush();
       }
     }
@@ -316,16 +318,18 @@ export const DataProviderMixin = (superClass) =>
       this._dataProviderController.clearCache();
       this._hasData = false;
       this.__updateVisibleRows();
-      this._ensureFirstPageLoaded();
+
+      if (!this._effectiveSize) {
+        this._dataProviderController.loadFirstPage();
+      }
     }
 
     /** @private */
     _pageSizeChanged(pageSize, oldPageSize) {
+      this._dataProviderController.setPageSize(pageSize);
+
       if (oldPageSize !== undefined && pageSize !== oldPageSize) {
-        this._dataProviderController.setPageSize(pageSize);
-        this._hasData = false;
-        this.__updateVisibleRows();
-        this._ensureFirstPageLoaded();
+        this.clearCache();
       }
     }
 
@@ -346,8 +350,7 @@ export const DataProviderMixin = (superClass) =>
       this._dataProviderController.setDataProvider(dataProvider ? dataProvider.bind(this) : null);
 
       if (oldDataProvider !== undefined) {
-        this._hasData = false;
-        this.__updateVisibleRows();
+        this.clearCache();
       }
 
       this._ensureFirstPageLoaded();
@@ -364,7 +367,7 @@ export const DataProviderMixin = (superClass) =>
       if (!this._hasData) {
         // Load data before adding rows to make sure they have content when
         // rendered for the first time.
-        this._dataProviderController.ensureFirstPageLoaded();
+        this._dataProviderController.loadFirstPage();
       }
     }
 
@@ -418,7 +421,7 @@ export const DataProviderMixin = (superClass) =>
         this._scrollToFlatIndex(targetIndex);
       }
 
-      if (this._dataProviderController.isLoading || !this.clientHeight) {
+      if (this._dataProviderController.isLoading() || !this.clientHeight) {
         this.__pendingScrollToIndexes = indexes;
       }
     }

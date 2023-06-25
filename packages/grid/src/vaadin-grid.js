@@ -738,7 +738,7 @@ class Grid extends ElementMixin(
     if (!this._columnTree) {
       return; // No columns
     }
-    if (isElementHidden(this) || this._dataProviderController.isLoading) {
+    if (isElementHidden(this) || this._dataProviderController.isLoading()) {
       this.__pendingRecalculateColumnWidths = true;
       return;
     }
@@ -751,7 +751,7 @@ class Grid extends ElementMixin(
     if (
       this.__pendingRecalculateColumnWidths &&
       !isElementHidden(this) &&
-      !this._dataProviderController.isLoading &&
+      !this._dataProviderController.isLoading() &&
       this.__hasRowsWithClientHeight()
     ) {
       this.__pendingRecalculateColumnWidths = false;

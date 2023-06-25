@@ -10,20 +10,22 @@ export class DataProviderController extends EventTarget {
     this.isExpanded = isExpanded;
     this.dataProvider = dataProvider;
     this.dataProviderParams = dataProviderParams;
-    this.rootCache = new Cache(undefined, undefined, pageSize, size, this.isExpanded);
+    this.rootCache = this.#createRootCache();
   }
 
   get effectiveSize() {
     return this.rootCache.effectiveSize;
   }
 
-  get isLoading() {
+  isLoading() {
     return this.rootCache.isLoading;
   }
 
   setSize(size) {
+    const delta = size - this.rootCache.size;
     this.size = size;
-    this.rootCache.setSize(size);
+    this.rootCache.size += delta;
+    this.rootCache.effectiveSize += delta;
   }
 
   setPageSize(pageSize) {
@@ -41,7 +43,7 @@ export class DataProviderController extends EventTarget {
   }
 
   clearCache() {
-    this.rootCache = new Cache(undefined, undefined, this.pageSize, this.size, this.isExpanded);
+    this.rootCache = this.#createRootCache();
   }
 
   getFlatIndexInfo(flatIndex) {
@@ -60,25 +62,21 @@ export class DataProviderController extends EventTarget {
     }
   }
 
-  ensureFlatIndexChildrenLoaded(flatIndex) {
+  ensureFlatIndexHierarchy(flatIndex) {
     const { cache, item, index } = this.getFlatIndexInfo(flatIndex);
 
-    if (item && this.isExpanded(item)) {
-      let subCache = cache.getSubCache(index);
-      if (!subCache) {
-        subCache = cache.createSubCache(index);
-      }
-
-      if (!subCache.isPageLoaded(0)) {
-        this.#loadCachePage(subCache, 0);
-      }
+    if (item && this.isExpanded(item) && !cache.getSubCache(index)) {
+      const subCache = cache.createSubCache(index);
+      this.#loadCachePage(subCache, 0);
     }
   }
 
-  ensureFirstPageLoaded() {
-    if (!this.rootCache.isPageLoaded(0)) {
-      this.#loadCachePage(this.rootCache, 0);
-    }
+  loadFirstPage() {
+    this.#loadCachePage(this.rootCache, 0);
+  }
+
+  #createRootCache() {
+    return new Cache(this, this.pageSize, this.size);
   }
 
   #loadCachePage(cache, page) {
@@ -95,12 +93,14 @@ export class DataProviderController extends EventTarget {
 
     const callback = (items, size) => {
       if (size !== undefined) {
-        cache.setSize(size);
+        cache.size = size;
       } else if (params.parentItem) {
-        cache.setSize(items.length);
+        cache.size = items.length;
       }
 
       cache.setPage(page, items);
+
+      this.recalculateEffectiveSize();
 
       this.dispatchEvent(new CustomEvent('page-received'));
 
