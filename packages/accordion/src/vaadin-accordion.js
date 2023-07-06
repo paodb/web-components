@@ -4,10 +4,11 @@
  * This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
  */
 import { FlattenedNodesObserver } from '@polymer/polymer/lib/utils/flattened-nodes-observer.js';
-import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { css, html, LitElement } from 'lit';
 import { isElementFocused } from '@vaadin/a11y-base/src/focus-utils.js';
 import { KeyboardDirectionMixin } from '@vaadin/a11y-base/src/keyboard-direction-mixin.js';
 import { ElementMixin } from '@vaadin/component-base/src/element-mixin.js';
+import { PolylitMixin } from '@vaadin/component-base/src/polylit-mixin.js';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 import { AccordionPanel } from './vaadin-accordion-panel.js';
 
@@ -60,24 +61,21 @@ import { AccordionPanel } from './vaadin-accordion-panel.js';
  * @mixes KeyboardDirectionMixin
  * @mixes ThemableMixin
  */
-class Accordion extends KeyboardDirectionMixin(ThemableMixin(ElementMixin(PolymerElement))) {
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-
-        :host([hidden]) {
-          display: none !important;
-        }
-      </style>
-      <slot></slot>
-    `;
-  }
-
+class Accordion extends KeyboardDirectionMixin(ThemableMixin(ElementMixin(PolylitMixin(LitElement)))) {
   static get is() {
     return 'vaadin-accordion';
+  }
+
+  static get styles() {
+    return css`
+      :host {
+        display: block;
+      }
+
+      :host([hidden]) {
+        display: none !important;
+      }
+    `;
   }
 
   static get properties() {
@@ -128,6 +126,11 @@ class Accordion extends KeyboardDirectionMixin(ThemableMixin(ElementMixin(Polyme
    */
   get focused() {
     return (this._getItems() || []).find((item) => isElementFocused(item.focusElement));
+  }
+
+  /** @protected */
+  render() {
+    return html`<slot></slot>`;
   }
 
   /**
