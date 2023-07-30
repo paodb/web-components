@@ -78,6 +78,16 @@ export class Cache {
   }
 
   /**
+   * An array of sub-caches sorted in the same order as their associated items
+   * appear in the `items` array.
+   *
+   * @return {Cache[]}
+   */
+  get subCaches() {
+    return Object.values(this.#subCacheByIndex);
+  }
+
+  /**
    * Whether the cache or any of its descendant caches have pending requests.
    *
    * @return {boolean}
@@ -87,19 +97,7 @@ export class Cache {
       return true;
     }
 
-    return Object.values(this.#subCacheByIndex).some((subCache) => subCache.isLoading);
-  }
-
-  /**
-   * An array of sub-caches sorted in the same order as their associated items
-   * appear in the `items` array.
-   *
-   * @return {Array<[number, Cache]>}
-   */
-  get subCaches() {
-    return Object.entries(this.#subCacheByIndex).map(([index, subCache]) => {
-      return [parseInt(index), subCache];
-    });
+    return this.subCaches.some((subCache) => subCache.isLoading);
   }
 
   /**
@@ -109,7 +107,7 @@ export class Cache {
     this.effectiveSize =
       !this.parentItem || this.controller.isExpanded(this.parentItem)
         ? this.size +
-          Object.values(this.#subCacheByIndex).reduce((total, subCache) => {
+          this.subCaches.reduce((total, subCache) => {
             subCache.recalculateEffectiveSize();
             return total + subCache.effectiveSize;
           }, 0)
@@ -181,7 +179,8 @@ export class Cache {
   getFlatIndex(index) {
     const clampedIndex = Math.max(0, Math.min(this.size - 1, index));
 
-    return this.subCaches.reduce((prev, [index, subCache]) => {
+    return this.subCaches.reduce((prev, subCache) => {
+      const index = subCache.parentCacheIndex;
       return clampedIndex > index ? prev + subCache.effectiveSize : prev;
     }, clampedIndex);
   }

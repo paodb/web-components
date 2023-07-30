@@ -13,7 +13,8 @@
 export function getFlatIndexInfo(cache, flatIndex, level = 0) {
   let levelIndex = flatIndex;
 
-  for (const [index, subCache] of cache.subCaches) {
+  for (const subCache of cache.subCaches) {
+    const index = subCache.parentCacheIndex;
     if (levelIndex <= index) {
       break;
     } else if (levelIndex <= index + subCache.effectiveSize) {
