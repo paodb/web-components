@@ -148,17 +148,7 @@ export class Cache {
    * @param {number} index
    */
   removeSubCache(index) {
-    const subCache = this.getSubCache(index);
     delete this.#subCacheByIndex[index];
-
-    this.controller.dispatchEvent(
-      new CustomEvent('sub-cache-removed', {
-        detail: {
-          cache: this,
-          subCache,
-        },
-      }),
-    );
   }
 
   /**
@@ -166,14 +156,6 @@ export class Cache {
    */
   removeSubCaches() {
     this.#subCacheByIndex = {};
-
-    this.controller.dispatchEvent(
-      new CustomEvent('sub-caches-removed', {
-        detail: {
-          cache: this,
-        },
-      }),
-    );
   }
 
   /**
@@ -186,16 +168,6 @@ export class Cache {
   createSubCache(index) {
     const subCache = new Cache(this.controller, this.pageSize, 0, this, index);
     this.#subCacheByIndex[index] = subCache;
-
-    this.controller.dispatchEvent(
-      new CustomEvent('sub-cache-created', {
-        detail: {
-          cache: this,
-          subCache,
-        },
-      }),
-    );
-
     return subCache;
   }
 
