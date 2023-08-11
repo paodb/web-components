@@ -1,8 +1,8 @@
 export class Cache {
   /**
-   * @type {import('../data-provider-controller.js').DataProviderController}
+   * @type {{ isExpanded: (item: unknown) => boolean }}
    */
-  controller;
+  context;
 
   /**
    * The number of items.
@@ -53,14 +53,14 @@ export class Cache {
   #subCacheByIndex = {};
 
   /**
-   * @param {Cache['controller']} controller
+   * @param {Cache['context']} context
    * @param {number} pageSize
    * @param {number | undefined} size
    * @param {Cache | undefined} parentCache
    * @param {number | undefined} parentCacheIndex
    */
-  constructor(controller, pageSize, size, parentCache, parentCacheIndex) {
-    this.controller = controller;
+  constructor(context, pageSize, size, parentCache, parentCacheIndex) {
+    this.context = context;
     this.pageSize = pageSize;
     this.size = size || 0;
     this.effectiveSize = size || 0;
@@ -105,7 +105,7 @@ export class Cache {
    */
   recalculateEffectiveSize() {
     this.effectiveSize =
-      !this.parentItem || this.controller.isExpanded(this.parentItem)
+      !this.parentItem || this.context.isExpanded(this.parentItem)
         ? this.size +
           this.subCaches.reduce((total, subCache) => {
             subCache.recalculateEffectiveSize();
@@ -164,7 +164,7 @@ export class Cache {
    * @return {Cache}
    */
   createSubCache(index) {
-    const subCache = new Cache(this.controller, this.pageSize, 0, this, index);
+    const subCache = new Cache(this.context, this.pageSize, 0, this, index);
     this.#subCacheByIndex[index] = subCache;
     return subCache;
   }

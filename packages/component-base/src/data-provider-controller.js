@@ -17,6 +17,10 @@ export class DataProviderController extends EventTarget {
     return this.rootCache.effectiveSize;
   }
 
+  get #cacheContext() {
+    return { isExpanded: this.isExpanded };
+  }
+
   isLoading() {
     return this.rootCache.isLoading;
   }
@@ -76,7 +80,7 @@ export class DataProviderController extends EventTarget {
   }
 
   #createRootCache() {
-    return new Cache(this, this.pageSize, this.size);
+    return new Cache(this.#cacheContext, this.pageSize, this.size);
   }
 
   #loadCachePage(cache, page) {
