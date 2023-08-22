@@ -355,8 +355,16 @@ class TimePicker extends PatternMixin(InputControlMixin(ThemableMixin(ElementMix
     return this.$.clearButton;
   }
 
-  get __hasBadInput() {
+  get __hasUnparsableValue() {
     return Boolean(this._inputElementValue && !this.i18n.parseTime(this._inputElementValue));
+  }
+
+  get __isValueCommitted() {
+    return this.__committedValue === this.value;
+  }
+
+  get __isUnparsableValueCommitted() {
+    return this.__committedUnparsableValueStatus === this.__hasUnparsableValue;
   }
 
   /** @protected */
@@ -419,7 +427,7 @@ class TimePicker extends PatternMixin(InputControlMixin(ThemableMixin(ElementMix
     return !!(
       this.inputElement.checkValidity() &&
       (!this.value || this._timeAllowed(this.i18n.parseTime(this.value))) &&
-      !this.__hasBadInput
+      !this.__hasUnparsableValue
     );
   }
 
@@ -465,7 +473,7 @@ class TimePicker extends PatternMixin(InputControlMixin(ThemableMixin(ElementMix
     super._setFocused(focused);
 
     if (!focused) {
-      this.__commitPendingValue();
+      this.__commitValueChange();
     }
   }
 
@@ -477,18 +485,15 @@ class TimePicker extends PatternMixin(InputControlMixin(ThemableMixin(ElementMix
     this.__dispatchChange();
   }
 
-  __commitPendingValue() {
-    const currentValue = this.value;
-    const currentBadInputStatus = this.__hasBadInput;
-
-    if (this.__committedValue !== currentValue) {
+  __commitValueChange() {
+    if (!this.__isValueCommitted) {
       this.__dispatchChange();
-    } else if (this.__committedBadInputStatus !== currentBadInputStatus) {
+    } else if (!this.__isUnparsableValueCommitted) {
       this.dispatchEvent(new CustomEvent('unparseable-change'));
     }
 
-    this.__committedValue = currentValue;
-    this.__committedBadInputStatus = currentBadInputStatus;
+    this.__committedValue = this.value;
+    this.__committedUnparsableValueStatus = this.__hasUnparsableValue;
   }
 
   /** @private */
@@ -622,9 +627,9 @@ class TimePicker extends PatternMixin(InputControlMixin(ThemableMixin(ElementMix
       this.__updateInputValue(parsedObj);
     }
 
-    if (!this.__skipCommittedValueUpdate) {
+    if (!this.__preserveCommittedValue) {
       this.__committedValue = this.value;
-      this.__committedBadInputStatus = this.__hasBadInput;
+      this.__committedUnparsableValueStatus = this.__hasUnparsableValue;
     }
 
     this._toggleHasValue(this._hasValue);
@@ -643,9 +648,9 @@ class TimePicker extends PatternMixin(InputControlMixin(ThemableMixin(ElementMix
       if (value !== newValue) {
         this._comboBoxValue = newValue;
       } else {
-        this.__skipCommittedValueUpdate = true;
+        this.__preserveCommittedValue = true;
         this.__updateValue(parsedObj);
-        this.__skipCommittedValueUpdate = false;
+        this.__preserveCommittedValue = false;
       }
     } else {
       // If the user input can not be parsed, set a flag
@@ -655,16 +660,16 @@ class TimePicker extends PatternMixin(InputControlMixin(ThemableMixin(ElementMix
         this.__keepInvalidInput = true;
       }
 
-      this.__skipCommittedValueUpdate = true;
+      this.__preserveCommittedValue = true;
       this.value = '';
-      this.__skipCommittedValueUpdate = false;
+      this.__preserveCommittedValue = false;
     }
   }
 
   /** @private */
   __onComboBoxChange(event) {
     event.stopPropagation();
-    this.__commitPendingValue();
+    this.__commitValueChange();
   }
 
   /**
