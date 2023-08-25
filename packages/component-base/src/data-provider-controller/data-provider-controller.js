@@ -1,5 +1,5 @@
-import { Cache } from './data-provider-controller/cache.js';
-import { getFlatIndexByPath, getFlatIndexInfo } from './data-provider-controller/helpers.js';
+import { Cache } from './cache.js';
+import { getFlatIndexByPath, getFlatIndexInfo } from './helpers.js';
 
 export class DataProviderController extends EventTarget {
   constructor(host, { size, pageSize, isExpanded, dataProvider, dataProviderParams }) {
