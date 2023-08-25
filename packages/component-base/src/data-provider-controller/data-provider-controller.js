@@ -7,6 +7,13 @@ import { Cache } from './cache.js';
 import { getFlatIndexByPath, getFlatIndexContext } from './helpers.js';
 
 export class DataProviderController extends EventTarget {
+  /**
+   * The number of items to display per page.
+   *
+   * @type {number}
+   */
+  pageSize;
+
   constructor(host, { size, pageSize, isExpanded, dataProvider, dataProviderParams }) {
     super();
     this.host = host;
@@ -63,10 +70,15 @@ export class DataProviderController extends EventTarget {
     return getFlatIndexByPath(this.rootCache, path);
   }
 
+  getPageByIndex(index) {
+    return Math.floor(index / this.pageSize);
+  }
+
   ensureFlatIndexLoaded(flatIndex) {
-    const { cache, page, item } = this.getFlatIndexContext(flatIndex);
+    const { cache, item, index } = this.getFlatIndexContext(flatIndex);
 
     if (!item) {
+      const page = this.getPageByIndex(index);
       this.__loadCachePage(cache, page);
     }
   }
@@ -86,7 +98,7 @@ export class DataProviderController extends EventTarget {
 
   /** @private */
   __createRootCache() {
-    return new Cache(this.__cacheContext, this.pageSize, this.size);
+    return new Cache(this.__cacheContext, this.size);
   }
 
   /** @private */
@@ -109,7 +121,10 @@ export class DataProviderController extends EventTarget {
         cache.size = items.length;
       }
 
-      cache.setPage(page, items);
+      const startIndex = page * this.pageSize;
+      items.forEach((item, i) => {
+        cache.items[startIndex + i] = item;
+      });
 
       this.recalculateEffectiveSize();
 

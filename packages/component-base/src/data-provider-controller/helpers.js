@@ -9,12 +9,11 @@
  * - the corresponding cache
  * - the associated item (if loaded)
  * - the corresponding index in the cache's items array.
- * - the page containing the index.
  * - the cache level
  *
  * @param {import('./cache.js').Cache} cache
  * @param {number} flatIndex
- * @return {{ cache: Cache, item: object | undefined, index: number, page: number, level: number }}
+ * @return {{ cache: Cache, item: object | undefined, index: number, level: number }}
  */
 export function getFlatIndexContext(cache, flatIndex, level = 0) {
   let levelIndex = flatIndex;
@@ -33,7 +32,6 @@ export function getFlatIndexContext(cache, flatIndex, level = 0) {
     cache,
     item: cache.items[levelIndex],
     index: levelIndex,
-    page: Math.floor(levelIndex / cache.pageSize),
     level,
   };
 }

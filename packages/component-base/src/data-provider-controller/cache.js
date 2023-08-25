@@ -18,13 +18,6 @@ export class Cache {
   size = 0;
 
   /**
-   * The number of items to display per page.
-   *
-   * @type {number}
-   */
-  pageSize;
-
-  /**
    * An array of cached items.
    *
    * @type {object[]}
@@ -62,14 +55,12 @@ export class Cache {
 
   /**
    * @param {Cache['context']} context
-   * @param {number} pageSize
    * @param {number | undefined} size
    * @param {Cache | undefined} parentCache
    * @param {number | undefined} parentCacheIndex
    */
-  constructor(context, pageSize, size, parentCache, parentCacheIndex) {
+  constructor(context, size, parentCache, parentCacheIndex) {
     this.context = context;
-    this.pageSize = pageSize;
     this.size = size || 0;
     this.parentCache = parentCache;
     this.parentCacheIndex = parentCacheIndex;
@@ -132,20 +123,6 @@ export class Cache {
   }
 
   /**
-   * Adds an array of items corresponding to the given page
-   * to the `items` array.
-   *
-   * @param {number} page
-   * @param {object[]} items
-   */
-  setPage(page, items) {
-    const startIndex = page * this.pageSize;
-    items.forEach((item, i) => {
-      this.items[startIndex + i] = item;
-    });
-  }
-
-  /**
    * Retrieves the sub-cache associated with the item at the given index
    * in the `items` array.
    *
@@ -181,7 +158,7 @@ export class Cache {
    * @return {Cache}
    */
   createSubCache(index) {
-    const subCache = new Cache(this.context, this.pageSize, 0, this, index);
+    const subCache = new Cache(this.context, 0, this, index);
     this.__subCacheByIndex[index] = subCache;
     return subCache;
   }
