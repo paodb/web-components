@@ -19,13 +19,6 @@ export class Cache {
   pageSize;
 
   /**
-   * The total number of items, including items from expanded sub-caches.
-   *
-   * @type {number}
-   */
-  effectiveSize = 0;
-
-  /**
    * An array of cached items.
    *
    * @type {object[]}
@@ -53,6 +46,13 @@ export class Cache {
   #subCacheByIndex = {};
 
   /**
+   * The total number of items, including items from expanded sub-caches.
+   *
+   * @type {number}
+   */
+  #effectiveSize = 0;
+
+  /**
    * @param {Cache['context']} context
    * @param {number} pageSize
    * @param {number | undefined} size
@@ -63,7 +63,7 @@ export class Cache {
     this.context = context;
     this.pageSize = pageSize;
     this.size = size || 0;
-    this.effectiveSize = size || 0;
+    this.#effectiveSize = size || 0;
     this.parentCache = parentCache;
     this.parentCacheIndex = parentCacheIndex;
   }
@@ -101,10 +101,19 @@ export class Cache {
   }
 
   /**
+   * The total number of items, including items from expanded sub-caches.
+   *
+   * @return {number}
+   */
+  get effectiveSize() {
+    return this.#effectiveSize;
+  }
+
+  /**
    * Recalculates the effective size for the cache and its descendant caches recursively.
    */
   recalculateEffectiveSize() {
-    this.effectiveSize =
+    this.#effectiveSize =
       !this.parentItem || this.context.isExpanded(this.parentItem)
         ? this.size +
           this.subCaches.reduce((total, subCache) => {

@@ -26,10 +26,9 @@ export class DataProviderController extends EventTarget {
   }
 
   setSize(size) {
-    const delta = size - this.rootCache.size;
     this.size = size;
-    this.rootCache.size += delta;
-    this.rootCache.effectiveSize += delta;
+    this.rootCache.size = size;
+    this.recalculateEffectiveSize();
   }
 
   setPageSize(pageSize) {
