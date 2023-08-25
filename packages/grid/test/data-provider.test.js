@@ -124,7 +124,7 @@ describe('data provider', () => {
   let grid;
 
   function getItemForIndex(index) {
-    const { item } = grid._dataProviderController.getFlatIndexInfo(index);
+    const { item } = grid._dataProviderController.getFlatIndexContext(index);
     return item;
   }
 
@@ -677,7 +677,7 @@ describe('wrapped grid', () => {
     const loadDebounceTime = 100;
 
     function getItemForIndex(index) {
-      const { item } = grid._dataProviderController.getFlatIndexInfo(index);
+      const { item } = grid._dataProviderController.getFlatIndexContext(index);
       return item;
     }
 

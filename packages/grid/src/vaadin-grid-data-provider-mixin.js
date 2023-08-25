@@ -176,7 +176,7 @@ export const DataProviderMixin = (superClass) =>
 
       el.index = index;
 
-      const { item } = this._dataProviderController.getFlatIndexInfo(index);
+      const { item } = this._dataProviderController.getFlatIndexContext(index);
       if (item) {
         this.__updateLoading(el, false);
         this._updateItem(el, item);
@@ -267,7 +267,7 @@ export const DataProviderMixin = (superClass) =>
      * @protected
      */
     _getIndexLevel(index = 0) {
-      const { level } = this._dataProviderController.getFlatIndexInfo(index);
+      const { level } = this._dataProviderController.getFlatIndexContext(index);
       return level;
     }
 
@@ -296,7 +296,7 @@ export const DataProviderMixin = (superClass) =>
         this._setLoading(false);
 
         this._getRenderedRows().forEach((row) => {
-          const { item } = this._dataProviderController.getFlatIndexInfo(row.index);
+          const { item } = this._dataProviderController.getFlatIndexContext(row.index);
           if (item) {
             this._getItem(row.index, row);
           }

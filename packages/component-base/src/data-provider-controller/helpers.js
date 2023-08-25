@@ -10,7 +10,7 @@
  * @param {number} flatIndex
  * @return {{ cache: Cache, item: object | undefined, index: number, page: number, level: number }}
  */
-export function getFlatIndexInfo(cache, flatIndex, level = 0) {
+export function getFlatIndexContext(cache, flatIndex, level = 0) {
   let levelIndex = flatIndex;
 
   for (const subCache of cache.subCaches) {
@@ -18,7 +18,7 @@ export function getFlatIndexInfo(cache, flatIndex, level = 0) {
     if (levelIndex <= index) {
       break;
     } else if (levelIndex <= index + subCache.effectiveSize) {
-      return getFlatIndexInfo(subCache, levelIndex - index - 1, level + 1);
+      return getFlatIndexContext(subCache, levelIndex - index - 1, level + 1);
     }
     levelIndex -= subCache.effectiveSize;
   }

@@ -1,5 +1,5 @@
 import { Cache } from './cache.js';
-import { getFlatIndexByPath, getFlatIndexInfo } from './helpers.js';
+import { getFlatIndexByPath, getFlatIndexContext } from './helpers.js';
 
 export class DataProviderController extends EventTarget {
   constructor(host, { size, pageSize, isExpanded, dataProvider, dataProviderParams }) {
@@ -50,8 +50,8 @@ export class DataProviderController extends EventTarget {
     this.rootCache = this.#createRootCache();
   }
 
-  getFlatIndexInfo(flatIndex) {
-    return getFlatIndexInfo(this.rootCache, flatIndex);
+  getFlatIndexContext(flatIndex) {
+    return getFlatIndexContext(this.rootCache, flatIndex);
   }
 
   getFlatIndexByPath(path) {
@@ -59,7 +59,7 @@ export class DataProviderController extends EventTarget {
   }
 
   ensureFlatIndexLoaded(flatIndex) {
-    const { cache, page, item } = this.getFlatIndexInfo(flatIndex);
+    const { cache, page, item } = this.getFlatIndexContext(flatIndex);
 
     if (!item) {
       this.#loadCachePage(cache, page);
@@ -67,7 +67,7 @@ export class DataProviderController extends EventTarget {
   }
 
   ensureFlatIndexHierarchy(flatIndex) {
-    const { cache, item, index } = this.getFlatIndexInfo(flatIndex);
+    const { cache, item, index } = this.getFlatIndexContext(flatIndex);
 
     if (item && this.isExpanded(item) && !cache.getSubCache(index)) {
       const subCache = cache.createSubCache(index);
