@@ -48,15 +48,17 @@ export class Cache {
    * in alphabetical order, rather than the order they were added.
    *
    * @type {Record<number, Cache>}
+   * @private
    */
-  #subCacheByIndex = {};
+  __subCacheByIndex = {};
 
   /**
    * The total number of items, including items from expanded sub-caches.
    *
    * @type {number}
+   * @private
    */
-  #effectiveSize = 0;
+  __effectiveSize = 0;
 
   /**
    * @param {Cache['context']} context
@@ -69,9 +71,9 @@ export class Cache {
     this.context = context;
     this.pageSize = pageSize;
     this.size = size || 0;
-    this.#effectiveSize = size || 0;
     this.parentCache = parentCache;
     this.parentCacheIndex = parentCacheIndex;
+    this.__effectiveSize = size || 0;
   }
 
   /**
@@ -90,7 +92,7 @@ export class Cache {
    * @return {Cache[]}
    */
   get subCaches() {
-    return Object.values(this.#subCacheByIndex);
+    return Object.values(this.__subCacheByIndex);
   }
 
   /**
@@ -112,14 +114,14 @@ export class Cache {
    * @return {number}
    */
   get effectiveSize() {
-    return this.#effectiveSize;
+    return this.__effectiveSize;
   }
 
   /**
    * Recalculates the effective size for the cache and its descendant caches recursively.
    */
   recalculateEffectiveSize() {
-    this.#effectiveSize =
+    this.__effectiveSize =
       !this.parentItem || this.context.isExpanded(this.parentItem)
         ? this.size +
           this.subCaches.reduce((total, subCache) => {
@@ -151,7 +153,7 @@ export class Cache {
    * @return {Cache | undefined}
    */
   getSubCache(index) {
-    return this.#subCacheByIndex[index];
+    return this.__subCacheByIndex[index];
   }
 
   /**
@@ -161,14 +163,14 @@ export class Cache {
    * @param {number} index
    */
   removeSubCache(index) {
-    delete this.#subCacheByIndex[index];
+    delete this.__subCacheByIndex[index];
   }
 
   /**
    * Removes all sub-caches.
    */
   removeSubCaches() {
-    this.#subCacheByIndex = {};
+    this.__subCacheByIndex = {};
   }
 
   /**
@@ -180,7 +182,7 @@ export class Cache {
    */
   createSubCache(index) {
     const subCache = new Cache(this.context, this.pageSize, 0, this, index);
-    this.#subCacheByIndex[index] = subCache;
+    this.__subCacheByIndex[index] = subCache;
     return subCache;
   }
 

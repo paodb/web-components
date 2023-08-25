@@ -15,14 +15,15 @@ export class DataProviderController extends EventTarget {
     this.isExpanded = isExpanded;
     this.dataProvider = dataProvider;
     this.dataProviderParams = dataProviderParams;
-    this.rootCache = this.#createRootCache();
+    this.rootCache = this.__createRootCache();
   }
 
   get effectiveSize() {
     return this.rootCache.effectiveSize;
   }
 
-  get #cacheContext() {
+  /** @private */
+  get __cacheContext() {
     return { isExpanded: this.isExpanded };
   }
 
@@ -51,7 +52,7 @@ export class DataProviderController extends EventTarget {
   }
 
   clearCache() {
-    this.rootCache = this.#createRootCache();
+    this.rootCache = this.__createRootCache();
   }
 
   getFlatIndexContext(flatIndex) {
@@ -66,7 +67,7 @@ export class DataProviderController extends EventTarget {
     const { cache, page, item } = this.getFlatIndexContext(flatIndex);
 
     if (!item) {
-      this.#loadCachePage(cache, page);
+      this.__loadCachePage(cache, page);
     }
   }
 
@@ -75,19 +76,21 @@ export class DataProviderController extends EventTarget {
 
     if (item && this.isExpanded(item) && !cache.getSubCache(index)) {
       const subCache = cache.createSubCache(index);
-      this.#loadCachePage(subCache, 0);
+      this.__loadCachePage(subCache, 0);
     }
   }
 
   loadFirstPage() {
-    this.#loadCachePage(this.rootCache, 0);
+    this.__loadCachePage(this.rootCache, 0);
   }
 
-  #createRootCache() {
-    return new Cache(this.#cacheContext, this.pageSize, this.size);
+  /** @private */
+  __createRootCache() {
+    return new Cache(this.__cacheContext, this.pageSize, this.size);
   }
 
-  #loadCachePage(cache, page) {
+  /** @private */
+  __loadCachePage(cache, page) {
     if (!this.dataProvider || cache.pendingRequests.has(page)) {
       return;
     }
