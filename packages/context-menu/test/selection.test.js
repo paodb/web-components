@@ -9,9 +9,8 @@ import '../vaadin-context-menu.js';
 describe('selection', () => {
   let menu, overlay;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     menu = fixtureSync('<vaadin-context-menu></vaadin-context-menu>');
-    overlay = menu.$.overlay;
     menu.renderer = (root) => {
       root.innerHTML = `
         <vaadin-list-box id="menu">
@@ -21,6 +20,8 @@ describe('selection', () => {
         </vaadin-list-box>
       `;
     };
+    await nextRender();
+    overlay = menu.$.overlay;
   });
 
   it('should close on item click', async () => {
@@ -43,6 +44,8 @@ describe('selection', () => {
 
     const item = overlay.querySelector('#menu vaadin-item');
     enter(item);
+    await nextRender(overlay);
+
     expect(spy.calledOnce).to.be.true;
   });
 

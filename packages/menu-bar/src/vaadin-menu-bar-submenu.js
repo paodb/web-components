@@ -6,7 +6,8 @@
 import './vaadin-menu-bar-item.js';
 import './vaadin-menu-bar-list-box.js';
 import './vaadin-menu-bar-overlay.js';
-import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+import { css, html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { ContextMenu } from '@vaadin/context-menu/src/vaadin-context-menu.js';
 
 /**
@@ -20,30 +21,15 @@ class MenuBarSubmenu extends ContextMenu {
     return 'vaadin-menu-bar-submenu';
   }
 
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
+  static get styles() {
+    return css`
+      :host {
+        display: block;
+      }
 
-        :host([hidden]) {
-          display: none !important;
-        }
-      </style>
-
-      <slot id="slot"></slot>
-
-      <vaadin-menu-bar-overlay
-        id="overlay"
-        on-opened-changed="_onOverlayOpened"
-        on-vaadin-overlay-open="_onVaadinOverlayOpen"
-        modeless="[[_modeless]]"
-        with-backdrop="[[_phone]]"
-        phone$="[[_phone]]"
-        model="[[_context]]"
-        theme$="[[_theme]]"
-      ></vaadin-menu-bar-overlay>
+      :host([hidden]) {
+        display: none !important;
+      }
     `;
   }
 
@@ -60,6 +46,25 @@ class MenuBarSubmenu extends ContextMenu {
    */
   get _tagNamePrefix() {
     return 'vaadin-menu-bar';
+  }
+
+  /** @protected */
+  render() {
+    return html`
+      <slot id="slot"></slot>
+
+      <vaadin-menu-bar-overlay
+        id="overlay"
+        .owner="${this}"
+        .modeless="${this._modeless}"
+        .withBackdrop="${this._phone}"
+        ?phone="${this._phone}"
+        .model="${this._context}"
+        theme="${ifDefined(this._theme)}"
+        @opened-changed="${this._onOverlayOpened}"
+        @vaadin-overlay-open="${this._onVaadinOverlayOpen}"
+      ></vaadin-menu-bar-overlay>
+    `;
   }
 
   /**

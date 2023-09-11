@@ -5,13 +5,14 @@
  */
 import './vaadin-contextmenu-event.js';
 import './vaadin-context-menu-overlay.js';
-import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { css, html, LitElement } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { isTouch } from '@vaadin/component-base/src/browser-utils.js';
-import { ControllerMixin } from '@vaadin/component-base/src/controller-mixin.js';
 import { ElementMixin } from '@vaadin/component-base/src/element-mixin.js';
 import { addListener, gestures, removeListener } from '@vaadin/component-base/src/gestures.js';
 import { MediaQueryController } from '@vaadin/component-base/src/media-query-controller.js';
 import { OverlayClassMixin } from '@vaadin/component-base/src/overlay-class-mixin.js';
+import { PolylitMixin } from '@vaadin/component-base/src/polylit-mixin.js';
 import { processTemplates } from '@vaadin/component-base/src/templates.js';
 import { ThemePropertyMixin } from '@vaadin/vaadin-themable-mixin/vaadin-theme-property-mixin.js';
 import { ItemsMixin } from './vaadin-contextmenu-items-mixin.js';
@@ -200,43 +201,25 @@ import { ItemsMixin } from './vaadin-contextmenu-items-mixin.js';
  *
  * @extends HTMLElement
  * @mixes ElementMixin
- * @mixes ControllerMixin
  * @mixes OverlayClassMixin
  * @mixes ThemePropertyMixin
  * @mixes ItemsMixin
  */
-class ContextMenu extends OverlayClassMixin(
-  ControllerMixin(ElementMixin(ThemePropertyMixin(ItemsMixin(PolymerElement)))),
-) {
-  static get template() {
-    return html`
-      <style>
-        :host {
-          display: block;
-        }
-
-        :host([hidden]) {
-          display: none !important;
-        }
-      </style>
-
-      <slot id="slot"></slot>
-
-      <vaadin-context-menu-overlay
-        id="overlay"
-        on-opened-changed="_onOverlayOpened"
-        on-vaadin-overlay-open="_onVaadinOverlayOpen"
-        modeless="[[_modeless]]"
-        with-backdrop="[[_phone]]"
-        phone$="[[_phone]]"
-        model="[[_context]]"
-        theme$="[[_theme]]"
-      ></vaadin-context-menu-overlay>
-    `;
-  }
-
+class ContextMenu extends ItemsMixin(OverlayClassMixin(ElementMixin(ThemePropertyMixin(PolylitMixin(LitElement))))) {
   static get is() {
     return 'vaadin-context-menu';
+  }
+
+  static get styles() {
+    return css`
+      :host {
+        display: block;
+      }
+
+      :host([hidden]) {
+        display: none !important;
+      }
+    `;
   }
 
   static get properties() {
@@ -268,6 +251,7 @@ class ContextMenu extends OverlayClassMixin(
       openOn: {
         type: String,
         value: 'vaadin-contextmenu',
+        sync: true,
       },
 
       /**
@@ -279,6 +263,7 @@ class ContextMenu extends OverlayClassMixin(
        */
       listenOn: {
         type: Object,
+        sync: true,
         value() {
           return this;
         },
@@ -293,6 +278,7 @@ class ContextMenu extends OverlayClassMixin(
         type: String,
         value: 'click',
         observer: '_closeOnChanged',
+        sync: true,
       },
 
       /**
@@ -308,6 +294,7 @@ class ContextMenu extends OverlayClassMixin(
        */
       renderer: {
         type: Function,
+        sync: true,
       },
 
       /**
@@ -360,6 +347,25 @@ class ContextMenu extends OverlayClassMixin(
     this._boundClose = this.close.bind(this);
     this._boundPreventDefault = this._preventDefault.bind(this);
     this._boundOnGlobalContextMenu = this._onGlobalContextMenu.bind(this);
+  }
+
+  /** @protected */
+  render() {
+    return html`
+      <slot id="slot"></slot>
+
+      <vaadin-context-menu-overlay
+        id="overlay"
+        .owner="${this}"
+        .modeless="${this._modeless}"
+        .withBackdrop="${this._phone}"
+        ?phone="${this._phone}"
+        .model="${this._context}"
+        theme="${ifDefined(this._theme)}"
+        @opened-changed="${this._onOverlayOpened}"
+        @vaadin-overlay-open="${this._onVaadinOverlayOpen}"
+      ></vaadin-context-menu-overlay>
+    `;
   }
 
   /** @protected */
@@ -448,6 +454,10 @@ class ContextMenu extends OverlayClassMixin(
 
   /** @private */
   _setListenOnUserSelect(value) {
+    if (!this.listenOn) {
+      return;
+    }
+
     // Note: these styles don't seem to work in Firefox on iOS.
     this.listenOn.style.webkitTouchCallout = value;
     this.listenOn.style.webkitUserSelect = value; // Chrome, Safari, Firefox
@@ -524,7 +534,7 @@ class ContextMenu extends OverlayClassMixin(
       renderer = this.__itemsRenderer;
     }
 
-    this.$.overlay.setProperties({ owner: this, renderer });
+    this.$.overlay.renderer = renderer;
   }
 
   /**
@@ -602,7 +612,11 @@ class ContextMenu extends OverlayClassMixin(
   }
 
   /** @private */
-  __alignOverlayPosition() {
+  async __alignOverlayPosition() {
+    if (!this.$) {
+      await this.updateComplete;
+    }
+
     const overlay = this.$.overlay;
 
     if (overlay.positionTarget) {

@@ -138,14 +138,17 @@ export const MenuBarMixin = (superClass) =>
       this._subMenu.addEventListener('item-selected', this.__onItemSelected.bind(this));
       this._subMenu.addEventListener('close-all-menus', this.__onEscapeClose.bind(this));
 
-      const overlay = this._subMenu.$.overlay;
-      overlay.addEventListener('keydown', this.__boundOnContextMenuKeydown);
-
       const container = this.shadowRoot.querySelector('[part="container"]');
       container.addEventListener('click', this.__onButtonClick.bind(this));
       container.addEventListener('mouseover', (e) => this._onMouseOver(e));
 
       this._container = container;
+
+      // Wait for the overlay to render
+      requestAnimationFrame(() => {
+        const overlay = this._subMenu.$.overlay;
+        overlay.addEventListener('keydown', this.__boundOnContextMenuKeydown);
+      });
     }
 
     /**
